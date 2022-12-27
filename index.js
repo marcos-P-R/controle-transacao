@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import admin from "firebase-admin";
 
 const app = express();
@@ -7,10 +7,11 @@ admin.initializeApp({
     credential: admin.credential.cert('./serviceAccountKey.json')
 });
 
-app.get('/transaction', (req, res) => {
-    console.log('Get Transactions');
+app.get('/transaction', async (req, res) => {
     admin.firestore()
     .collection('transactions')
+    .where('user.id', '==', decodeIdToken.sub)
+    .orderBy('date', 'desc')
     .get()
     .then(snapshot =>{
         const transaction = snapshot.docs.map(doc => ({
